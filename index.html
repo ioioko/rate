@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Our Service</title>
+
+    <!-- CSS STYLES -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .ratings-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1em;
+            margin-top: 2em;
+        }
+        .rating-btn {
+            border: none;
+            border-radius: 8px;
+            padding: 1em;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 120px;
+            color: white;
+        }
+        .rating-btn:hover {
+            transform: scale(1.1);
+        }
+        .very-good { background-color: #28a745; }
+        .good { background-color: #82c91e; }
+        .neutral { background-color: #ffc107; }
+        .bad { background-color: #fd7e14; }
+        .worst { background-color: #dc3545; }
+        #message {
+            margin-top: 1.5em;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HTML CONTENT -->
+    <div class="container">
+        <h1>How was your experience?</h1>
+        <div class="ratings-container">
+            <button class="rating-btn very-good" data-rating="Very Good" data-value="5">😊<br>Very Good</button>
+            <button class="rating-btn good" data-rating="Good" data-value="4">🙂<br>Good</button>
+            <button class="rating-btn neutral" data-rating="Neutral" data-value="3">😐<br>Neutral</button>
+            <button class="rating-btn bad" data-rating="Bad" data-value="2">🙁<br>Bad</button>
+            <button class="rating-btn worst" data-rating="Worst" data-value="1">😠<br>Worst</button>
+        </div>
+        <p id="message"></p>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- YOUR GOOGLE SCRIPT URL IS PASTED HERE ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbbIskecHL7wOKE01m60CAek-npcLxzGEw96b56-s_l1G2CQfw1e1v5sVYIF2uaQfY/exec";
+
+        const ratingButtons = document.querySelectorAll('.rating-btn');
+        const messageElement = document.getElementById('message');
+
+        ratingButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const rating = button.dataset.rating;
+                const value = button.dataset.value;
+
+                messageElement.textContent = "Sending your feedback...";
+
+                const data = { rating: rating, value: value };
+
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    redirect: 'follow',
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.result === 'success') {
+                        messageElement.textContent = "Thank you for your feedback!";
+                    } else {
+                        // This else block might not even be reached if there's a CORS error
+                        messageElement.textContent = "Oops! Something went wrong.";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    messageElement.textContent = "Oops! Something went wrong.";
+                });
+            });
+        });
+    </script>
+</body>
+</html>
